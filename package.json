@@ -1,0 +1,44 @@
+{
+  "name": "@quvrsite/sdk",
+  "version": "0.1.0",
+  "description": "Official-style TypeScript/JavaScript client for the QUVR public API (bridge quotes, chains, stock tokens, live ticker, waitlist).",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "example": "node --loader ts-node/esm examples/basic.ts"
+  },
+  "keywords": [
+    "quvr",
+    "robinhood-chain",
+    "bridge",
+    "stock-tokens",
+    "usdg",
+    "sdk"
+  ],
+  "author": "QUVR",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quvrsite/quvr-sdk-js"
+  },
+  "homepage": "https://quvr.site",
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^22.5.0"
+  }
+}
