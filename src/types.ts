@@ -1,26 +1,38 @@
-/**
- * Shared type definitions for the QUVR public API responses.
- * These mirror the shapes returned by the QUVR Next.js API routes
- * (app/api/tokens, app/api/chains, app/api/quote, app/api/ticker, ...).
- *
- * NOTE: these are best-effort types based on the publicly observable API
- * surface. If the QUVR team changes response shapes, please open a PR.
- */
+export interface QuiverClientOptions {
+  /** Base URL of the Quiver app, e.g. "https://quvr.site". No trailing slash. */
+  baseUrl: string;
+  /** Optional fetch implementation override (useful for testing / non-browser envs). */
+  fetchImpl?: typeof fetch;
+  /** Request timeout in ms. Default 10_000. */
+  timeoutMs?: number;
+  /**
+   * How long GET responses are cached in-memory before a fresh request is made,
+   * in ms. Default 20_000 (20s). This is what keeps every consumer of this SDK
+   * (widget, CLI, bot) from hammering endpoints that back onto metered
+   * third-party data providers. Set to 0 to disable caching (not recommended
+   * for anything that polls automatically).
+   */
+  cacheTtlMs?: number;
+  /**
+   * If a request is rate-limited (HTTP 429), how many times to retry with
+   * exponential backoff before giving up. Default 2.
+   */
+  maxRetriesOn429?: number;
+}
 
-export type TokenCategory = "stock" | "stablecoin" | "other";
-
-export interface QuvrToken {
+export interface Token {
   id: string;
   symbol: string;
   name: string;
-  category: TokenCategory;
-  cached_price_usd: number | null;
+  category: string;
+  cached_price_usd: number | string | null;
 }
 
-export interface QuvrChain {
+export interface Chain {
   id: number;
   name: string;
-  explorer_url: string;
+  isSource: boolean;
+  isDestination: boolean;
 }
 
 export type BridgeRoute =
@@ -33,7 +45,7 @@ export interface QuoteRequest {
   srcChainId: number;
   dstChainId: number;
   tokenSymbol: string;
-  /** Raw units (wei) as a decimal string, to avoid precision loss. */
+  /** Raw amount in the smallest unit (wei/base units), as a string to avoid overflow. */
   amount: string;
   recipientAddress: `0x${string}`;
   route: BridgeRoute;
@@ -41,69 +53,40 @@ export interface QuoteRequest {
 
 export interface QuoteResponse {
   route: BridgeRoute;
-  srcChainId: number;
-  dstChainId: number;
-  tokenSymbol: string;
-  amountIn: string;
-  amountOut: string;
-  feeUsd?: number;
-  estimatedSeconds?: number;
+  fee: string;
+  estimatedTimeSeconds?: number;
   [key: string]: unknown;
 }
 
-export type TickerBadge =
-  | "split queued"
-  | "reverse split queued"
-  | "dividend queued"
-  | null;
-
-export interface LivePrice {
+export interface TrenchesToken {
+  address: string;
   symbol: string;
-  priceUsd: number;
-  changePct24h: number | null;
-  tone: "up" | "down" | "flat";
-  badge: TickerBadge;
-  multiplier?: string | null;
-}
-
-export interface TickerResponse {
-  prices: LivePrice[];
-}
-
-export interface BridgeInitiateRequest {
-  srcChainId: number;
-  dstChainId: number;
-  assetId: string;
-  amountRaw: string;
-  srcTxHash: `0x${string}`;
-  route: BridgeRoute;
-}
-
-export interface WatchlistSummary {
-  id: string;
   name: string;
-  is_default: boolean;
-  created_at: string;
+  priceUsd?: number;
+  marketCapUsd?: number;
+  [key: string]: unknown;
 }
 
-export interface PortfolioHolding {
-  token_id: string;
-  ui_balance: number;
-  price_usd: number;
-  value_usd: number;
-  snapshot_at: string;
-  tokens: {
-    symbol: string;
-    name: string;
-    category: TokenCategory;
-  };
+export interface TrenchesResponse {
+  tokens: TrenchesToken[];
+  [key: string]: unknown;
 }
 
-export interface PortfolioResponse {
-  holdings: PortfolioHolding[];
-  totalValueUsd: number;
+export interface LaunchpadToken {
+  address: string;
+  symbol: string;
+  name: string;
+  imageUrl?: string;
+  [key: string]: unknown;
 }
 
-export interface QuvrApiError {
-  error: string | Record<string, unknown>;
+export class QuiverApiError extends Error {
+  status: number;
+  body: unknown;
+  constructor(message: string, status: number, body: unknown) {
+    super(message);
+    this.name = "QuiverApiError";
+    this.status = status;
+    this.body = body;
+  }
 }

@@ -1,44 +1,27 @@
 {
-  "name": "@quvrsite/sdk",
+  "name": "@quiver/sdk",
   "version": "0.1.0",
-  "description": "Official-style TypeScript/JavaScript client for the QUVR public API (bridge quotes, chains, stock tokens, live ticker, waitlist).",
-  "type": "module",
+  "description": "Official TypeScript SDK for the Quiver public API (Robinhood Chain bridge quotes, Stock Token/USDG watchlist data, Trenches trending data, Launchpad tokens).",
   "main": "dist/index.js",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
+  "type": "module",
+  "files": ["dist"],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch",
-    "lint": "tsc -p tsconfig.json --noEmit",
-    "example": "node --loader ts-node/esm examples/basic.ts"
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
-  "keywords": [
-    "quvr",
-    "robinhood-chain",
-    "bridge",
-    "stock-tokens",
-    "usdg",
-    "sdk"
-  ],
-  "author": "QUVR",
+  "keywords": ["quiver", "robinhood-chain", "bridge", "layerzero", "stargate", "web3", "sdk"],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/quvrsite/quvr-sdk-js"
+    "url": "https://github.com/quvrsite/quiver-sdk.git"
   },
-  "homepage": "https://quvr.site",
   "devDependencies": {
-    "typescript": "^5.6.0",
-    "ts-node": "^10.9.2",
-    "@types/node": "^22.5.0"
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
   }
 }
